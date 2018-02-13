@@ -14,12 +14,15 @@ ReactCountdownClock = CreateReactClass
   displayName: 'ReactCountdownClock'
 
   componentDidUpdate: (prevProps) ->
-    if prevProps.seconds != @props.seconds
+    if prevProps.seconds != @props.seconds || prevProps.totalSeconds != @props.totalSeconds
       @_seconds = @props.seconds
+      @_totalSeconds = @props.totalSeconds
+      if @_totalSeconds == -1
+        @_totalSeconds = @props.seconds
       @_stopTimer()
       @_setupTimer()
 
-    if prevProps.color != @props.color
+    if prevProps.color != @props.color || prevProps.totalSeconds != @props.totalSeconds
       @_clearBackground()
       @_drawBackground()
       @_updateCanvas()
@@ -30,6 +33,9 @@ ReactCountdownClock = CreateReactClass
 
   componentDidMount: ->
     @_seconds = @props.seconds
+    @_totalSeconds = @props.totalSeconds
+    if @_totalSeconds == -1
+      @_totalSeconds = @props.seconds
     @_setupTimer()
 
   componentWillUnmount: ->
@@ -48,7 +54,7 @@ ReactCountdownClock = CreateReactClass
 
   _setScale: ->
     @_radius      = @props.size / 2
-    @_fraction    = 2 / @_seconds
+    @_fraction    = 2 / @_totalSeconds
     @_tickPeriod  = @_calculateTick()
     @_innerRadius =
       if @props.weight
@@ -192,6 +198,7 @@ ReactCountdownClock = CreateReactClass
 
 ReactCountdownClock.propTypes =
   seconds: PropTypes.number
+  totalSeconds: PropTypes.number
   size: PropTypes.number
   weight: PropTypes.number
   color: PropTypes.string
@@ -207,6 +214,7 @@ ReactCountdownClock.propTypes =
 
 ReactCountdownClock.defaultProps =
   seconds: 60
+  totalSeconds: -1
   size: 300
   color: '#000'
   alpha: 1
