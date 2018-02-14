@@ -14,15 +14,11 @@ ReactCountdownClock = CreateReactClass
   displayName: 'ReactCountdownClock'
 
   componentDidUpdate: (prevProps) ->
-    if prevProps.seconds != @props.seconds || prevProps.totalSeconds != @props.totalSeconds
-      @_seconds = @props.seconds
-      @_totalSeconds = @props.totalSeconds
-      if @_totalSeconds == -1
-        @_totalSeconds = @props.seconds
+    if prevProps.finishTime != @props.finishTime || prevProps.startTime != @props.startTime
+      @_totalSeconds = (@props.finishTime-@props.startTime)/1000
+      @_seconds = (@props.finishTime-Date.now())/1000
       @_stopTimer()
       @_setupTimer()
-
-    if prevProps.color != @props.color || prevProps.totalSeconds != @props.totalSeconds
       @_clearBackground()
       @_drawBackground()
       @_updateCanvas()
@@ -32,10 +28,8 @@ ReactCountdownClock = CreateReactClass
       @_pauseTimer() if @props.paused
 
   componentDidMount: ->
-    @_seconds = @props.seconds
-    @_totalSeconds = @props.totalSeconds
-    if @_totalSeconds == -1
-      @_totalSeconds = @props.seconds
+    @_totalSeconds = (@props.finishTime-@props.startTime)/1000
+    @_seconds = (@props.finishTime-Date.now())/1000
     @_setupTimer()
 
   componentWillUnmount: ->
@@ -102,11 +96,8 @@ ReactCountdownClock = CreateReactClass
       @refs.component.removeEventListener 'click', @props.onClick
 
   _tick: ->
-    start = Date.now()
     @_timeoutIds.push(setTimeout ( =>
-      duration = (Date.now() - start) / 1000
-      @_seconds -= duration
-
+      @_seconds = (@props.finishTime-Date.now())/1000
       if @_seconds <= 0
         @_seconds = 0
         @_handleComplete()
@@ -197,6 +188,8 @@ ReactCountdownClock = CreateReactClass
     </div>
 
 ReactCountdownClock.propTypes =
+  finishTime: PropTypes.instanceOf(Date)
+  startTime: PropTypes.instanceOf(Date)
   seconds: PropTypes.number
   totalSeconds: PropTypes.number
   size: PropTypes.number
